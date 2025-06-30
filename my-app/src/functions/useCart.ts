@@ -2,6 +2,7 @@ import { cartAtom } from "@/atoms";
 import { product } from "@/generated/prisma";
 import { Cart, CartItem } from "@/types/types";
 import { useAtom } from "jotai";
+import { useEffect } from "react";
 
 export const useCart = (): {
     cart: Cart,
@@ -11,13 +12,29 @@ export const useCart = (): {
 } => {
     const [cart, setCart] = useAtom(cartAtom);
 
+    // initialize with cart from localStorage
+    useEffect(() => {
+        const persistedCart = localStorage.getItem('cart');
+        if (persistedCart && cart.length === 0) {
+            setCart(JSON.parse(persistedCart));
+        }
+    }, []);
+
+    // This is a setCart wrapper : do setCart and persist in localStorage
+    const handleSetCart = (setStateFn: (cart: Cart) => Cart) => {
+        setCart((prevCart: Cart) => {
+            const newCart = setStateFn(prevCart);
+            localStorage.setItem('cart', JSON.stringify(newCart));
+            return newCart;
+        });
+    };
+
     const handleAddToCart = (
         product: product,
         quantity: number,
     ) => {
-        setCart((prevCart: Cart) => {
+        handleSetCart((prevCart: Cart) => {
             const existingItemIndex = prevCart.findIndex((cartItem: CartItem) => cartItem.product.id === product.id);
-            
             if (existingItemIndex !== -1) {
                 // Product already exists, update quantity
                 return prevCart.map((cartItem: CartItem, index: number) => {
@@ -41,9 +58,8 @@ export const useCart = (): {
         newQuantity: number,
     ) => {
         newQuantity = newQuantity > 0 ? newQuantity : 0;
-        
-        setCart((prevCart: Cart) => (
-            prevCart.map((cartItem: CartItem) => {
+        handleSetCart((prevCart: Cart) => {
+            return prevCart.map((cartItem: CartItem) => {
                 if (cartItem.product.id === product.id) {
                     return {
                         ...cartItem,
@@ -51,16 +67,16 @@ export const useCart = (): {
                     }
                 }
                 return cartItem;
-            })
-        ))
+            });
+        });
     };
 
     const handleRemoveFromCart = (
         product: product,
     ) => {
-        setCart((prevCart: Cart) => (
-            prevCart.filter((cartItem: CartItem) => cartItem.product.id !== product.id)
-        ))
+        handleSetCart((prevCart: Cart) => {
+            return prevCart.filter((cartItem: CartItem) => cartItem.product.id !== product.id);
+        });
     };
     
     return {

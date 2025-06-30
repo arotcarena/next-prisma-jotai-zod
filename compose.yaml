@@ -1,0 +1,34 @@
+services:
+
+  front:
+    build:
+      context: .
+    restart: always
+    user: "node"
+    working_dir: /home/node/app
+    environment:
+      NODE_ENV: development
+      NPM_CONFIG_LOGLEVEL: info
+    ports:
+      - 3000:3000
+    volumes:
+      - ./my-app/:/home/node/app
+    command: ["tail", "-f", "/dev/null"] # keep the container running
+
+  database:
+    image: mysql:8.1.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: npjz
+    volumes:
+      - npjz_database_volume:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  npjz_database_volume:

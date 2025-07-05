@@ -1,11 +1,13 @@
 'use client'
 
+import { cartAtom } from "@/atoms";
 import { CartLine } from "@/components/cards/cart-line";
-import { useCart } from "@/functions/useCart";
+import { useCartInit, useCartRead } from "@/functions/useCart";
 import { CartItem } from "@/types/types";
 
 export const Cart = () => {
-    const { cart } = useCart();
+    useCartInit();
+    const {cart} = useCartRead();
 
     return (
         <div className="flex flex-col gap-y-4">

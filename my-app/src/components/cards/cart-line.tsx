@@ -1,20 +1,20 @@
 'use client'
 
-import { product } from "@/generated/prisma"
-import { useCart } from "@/functions/useCart";
+import { useCartWrite } from "@/functions/useCart";
 import { formatPrice } from "@/functions/priceFormater";
 import type { CartItem } from "@/types/types";
 import { Button } from "../ui/button";
 import { MinusIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { memo } from "react";
 
 type Props = {
     cartItem: CartItem,
 };
 
-export const CartLine = ({
+export const CartLine = memo(({
     cartItem,
 }: Props) => {
-    const { changeQuantity, removeFromCart } = useCart();
+    const { changeQuantity, removeFromCart } = useCartWrite();
 
     return (
         <div className="flex items-center justify-between px-4 my-4">
@@ -39,4 +39,4 @@ export const CartLine = ({
             </Button>
         </div>
     )
-}
+})

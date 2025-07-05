@@ -2,7 +2,7 @@
 
 import { product } from "@/generated/prisma"
 import { Button } from "../ui/button";
-import { useCart } from "@/functions/useCart";
+import { useCartWrite } from "@/functions/useCart";
 import { ShoppingCartIcon } from "lucide-react";
 import { formatPrice } from "@/functions/priceFormater";
 
@@ -13,7 +13,7 @@ type Props = {
 export const ProductCard = ({
     product,
 }: Props) => {
-    const { addToCart } = useCart();
+    const {addToCart} = useCartWrite();
 
     return (
         <div className="border border-gray-300 rounded-md p-4 w-[250px] text-center">

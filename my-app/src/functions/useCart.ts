@@ -1,17 +1,12 @@
 import { cartAtom } from "@/atoms";
 import { product } from "@/generated/prisma";
 import { Cart, CartItem } from "@/types/types";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 
-export const useCart = (): {
-    cart: Cart,
-    addToCart: (product: product, quantity: number) => void,
-    changeQuantity: (product: product, newQuantity: number) => void,
-    removeFromCart: (product: product) => void,
-} => {
-    const [cart, setCart] = useAtom(cartAtom);
 
+export const useCartInit = (): void => {
+    const [cart, setCart] = useAtom(cartAtom);
     // initialize with cart from localStorage
     useEffect(() => {
         const persistedCart = localStorage.getItem('cart');
@@ -19,6 +14,31 @@ export const useCart = (): {
             setCart(JSON.parse(persistedCart));
         }
     }, []);
+}
+
+export const useCartRead = (): {
+    cart: Cart,
+    count: number,
+    total: number,
+} => {
+    const cart = useAtomValue(cartAtom);
+
+    const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+    const total = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+
+    return {
+        cart,
+        count,
+        total,
+    }
+}
+
+export const useCartWrite = (): {
+    addToCart: (product: product, quantity: number) => void,
+    changeQuantity: (product: product, newQuantity: number) => void,
+    removeFromCart: (product: product) => void,
+} => {
+    const setCart = useSetAtom(cartAtom);
 
     // This is a setCart wrapper : do setCart and persist in localStorage
     const handleSetCart = (setStateFn: (cart: Cart) => Cart) => {
@@ -80,7 +100,6 @@ export const useCart = (): {
     };
     
     return {
-        cart,
         addToCart: handleAddToCart,
         changeQuantity: handleChangeQuantity,
         removeFromCart: handleRemoveFromCart,

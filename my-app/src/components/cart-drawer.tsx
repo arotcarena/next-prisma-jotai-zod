@@ -4,7 +4,6 @@ import {
     Drawer,
     DrawerClose,
     DrawerContent,
-    DrawerDescription,
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
@@ -15,13 +14,11 @@ import { Button } from "./ui/button"
 import Link from "next/link"
 import { Cart } from "@/features/cart"
 import { Badge } from "./ui/badge"
-import { useCart } from "@/functions/useCart"
 import { formatPrice } from "@/functions/priceFormater"
+import { useCartRead } from "@/functions/useCart"
 
 export const CartDrawer = () => {
-    const { cart } = useCart();
-    const count = cart.reduce((acc, item) => acc + item.quantity, 0);
-    const total = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+    const { count, total } = useCartRead();
 
     return (
         <Drawer direction="right">
